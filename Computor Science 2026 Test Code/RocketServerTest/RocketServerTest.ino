@@ -1,9 +1,11 @@
+//Aidan Young - 21274
 #include <WiFi.h>
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <LittleFS.h>
 #include <ArduinoJson.h>
 
+//Wifi login details
 const char* SSID = "REPLACE_WITH_YOUR_SSID";
 const char* PASSWORD = "REPLACE_WITH_YOUR_PASSWORD";
 
@@ -21,6 +23,7 @@ const char* INPUT1PATH = "/input1.txt";
 const char* INPUT2PATH = "/input2.txt";
 const char* INPUT2PATH = "/input3.txt";
 
+//Check if littleFs has been intilized and report back results
 void initLittleFs() 
 {
   if (!LittleFS.begin(true)) 
@@ -33,6 +36,7 @@ void initLittleFs()
   }
 }
 
+//Convert file into more code freindly data (string), also check if file can be opened
 String readFile(fs::FS &fs, const char* PATH) {
   Serial.printf("Reading file: %s\r\n", PATH);
   File file = fs.open(PATH);
@@ -75,6 +79,7 @@ void writeFile(fs::FS &fs, const char* PATH, const char* MESSAGE)
   }
 }
 
+//Signs into wifi and intilizes it
 void initWiFi() 
 {
   WiFi.mode(WIFI_STA);
@@ -90,6 +95,7 @@ void initWiFi()
   Serial.println(WiFi.localIP());
 }
 
+//Gets values from json document which is derried from the website
 String getCurrentInputValues() 
 {
   JsonDocument values;
@@ -104,18 +110,23 @@ String getCurrentInputValues()
 
 void setup() 
 {
+  //Setup serial monitor
   Serial.begin(115200);
 
+  //Read inputs from website
   input1 = readFile(LittleFS, INPUT1PATH);
   input2 = readFile(LittleFS, INPUT2PATH);
   input3 = readFile(LittleFS, INPUT3PATH);
 
+  //Register a handler for HTTP GET requests to the root URL
+  //Sends the main webpage (index.html) to littlefs
   server.on("/", HTTP_GET, [](AsyncWebServerRequest *request) {
     request->send(LittleFS, "/index.html", "text/html");
   });
 
   server.serveStatic("/", LittleFS, "/");
 
+  // Returns "/values" inputs to JSON
   server.on("/values", HTTP_GET, [](AsyncWebServerRequest *request) {
     String json = getCurrentInputValues();
     request->send(200, "application/json", json);
@@ -125,6 +136,7 @@ void setup()
   server.on("/", HTTP_POST, [](AsyncWebServerRequest *request) {
     int params = request->params();
 
+    //Loop through all parameters sent from the form
     for (int i = 0; i < params; i++) {
       const AsyncWebParameter* p = request->getParam(i);
 
@@ -144,14 +156,14 @@ void setup()
         }
 
         if (p->name() == PARAM_INPUT_3) {
-          input2 = p->value().c_str();
+          input3 = p->value().c_str();
           Serial.print("Input 3 set to: ");
           Serial.println(input3);
-          writeFile(LittleFS, INPUT3PATH, input2.c_str());
+          writeFile(LittleFS, INPUT3PATH, input3.c_str());
         }
       }
     }
-
+    //Reload page after proccesing
     request->send(LittleFS, "/index.html", "text/html");
   });
 
