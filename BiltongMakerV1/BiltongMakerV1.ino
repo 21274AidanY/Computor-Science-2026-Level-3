@@ -4,14 +4,22 @@
 #include <WiFi.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_ST7789.h>
+#include <Wire.h>
 #include <SPI.h>
+#include <Adafruit_AHTX0.h>
+#include <Adafruit_BMP280.h>
 
 //--- WiFi Info/Config ---
-const char SSID[] = "SECRET_SSID";
-const char PASSWORD[] = "SECRET_PASS";
+const char SSID[] = "T8-Arduino";
+const char PASSWORD[] = "T8-Arduino";
 
 //--- Screen Info/Config---
 Adafruit_ST7789 tftScreen = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
+
+//--- AHT and BMP sensors ---
+//Uses I2C interface, no pin declaration needed
+Adafruit_AHTX0 aht; //Tempreature and humidity
+Adafruit_BMP280 bmp; //Tempreature and preassure
 
 void setup() 
 {
@@ -45,9 +53,41 @@ void setup()
   }
 
   Serial.println("- WiFi has been initilized successfully -");
+
+  Serial.println("- Initilizing Sensors -");
+  // AHT20 initilize
+  if (!aht.begin()) 
+  {
+    Serial.println("AHT20 not found!");
+    while (1);
+  }
+
+  // BMP280 init (0x76 or 0x77)
+  if (!bmp.begin(0x77)) 
+  {
+    Serial.println("BMP280 not found at 0x77!");
+    while (1);
+  }
+
+  Serial.println("- Sensors initilized successfully -");
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  //Test sensor readings
+  sensors_event_t humidity, temp;
+  aht.getEvent(&humidity, &temp);
 
+  Serial.print("AHT20 Temp: ");
+  Serial.print(temp.temperature);
+  Serial.print(" °C, Humidity: ");
+  Serial.print(humidity.relative_humidity);
+  Serial.println(" %");
+
+  Serial.print("BMP280 Temp: ");
+  Serial.print(bmp.readTemperature());
+  Serial.print(" °C, Pressure: ");
+  Serial.print(bmp.readPressure() / 100.0);
+  Serial.println(" hPa");
+
+  delay(2000);
 }
