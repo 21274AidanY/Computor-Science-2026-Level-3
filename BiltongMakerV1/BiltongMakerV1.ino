@@ -3,7 +3,8 @@
 
 #include <WiFi.h>
 #include <Adafruit_GFX.h>
-#include <Adafruit_ST7789.h>
+//#include <Adafruit_ST7789.h>
+#include <LittleFS.h>
 #include <Wire.h>
 #include <SPI.h>
 #include <Adafruit_AHTX0.h>
@@ -14,12 +15,66 @@ const char SSID[] = "T8-Arduino";
 const char PASSWORD[] = "T8-Arduino";
 
 //--- Screen Info/Config---
-Adafruit_ST7789 tftScreen = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
+//Adafruit_ST7789 tftScreen = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
 
 //--- AHT and BMP sensors ---
 //Uses I2C interface, no pin declaration needed
 Adafruit_AHTX0 aht; //Tempreature and humidity
 Adafruit_BMP280 bmp; //Tempreature and preassure
+
+//LittleFS setup - wants to be first method for some reason?
+void initLittleFS() 
+{
+  if (!LittleFS.begin(true)) 
+  {
+    Serial.println("- LittleFS failed to initilize -");
+  } 
+  else 
+  {
+    Serial.println("- LittleFS has been initilized successfully -");
+  }
+}
+
+//LittleFS reading a file 
+String readFile(fs::FS& fs, const char* path) 
+{
+  Serial.print("Reading file: ");
+  Serial.println(path);
+  File file = fs.open(path);
+  if (!file || file.isDirectory()) 
+  {
+    Serial.println("readFile failed to open file");
+    return String();
+  }
+  String fileContent;
+  while (file.available()) 
+  {
+    fileContent = file.readStringUntil('\n');
+    break;
+  }
+  return fileContent;
+}
+
+//LittleFS writing a file
+void writeFile(fs::FS& fs, const char* path, const char* message) 
+{
+  Serial.print("Writing file: ");
+  Serial.println(path);
+  File file = fs.open(path, FILE_WRITE);
+  if (!file) 
+  {
+    Serial.println("writeFile failed to write to file");
+    return;
+  }
+  if (file.print(message)) 
+  {
+    Serial.println("- writeFile success");
+  } 
+  else 
+  {
+    Serial.println("- writeFile failed");
+  }
+}
 
 void setup() 
 {
@@ -53,6 +108,9 @@ void setup()
   }
 
   Serial.println("- WiFi has been initilized successfully -");
+
+  Serial.println("- Initilizing LittleFS -");
+  initLittleFS();
 
   Serial.println("- Initilizing Sensors -");
   // AHT20 initilize
