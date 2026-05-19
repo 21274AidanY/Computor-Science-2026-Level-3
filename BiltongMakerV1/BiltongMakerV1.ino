@@ -3,24 +3,30 @@
 
 #include <WiFi.h>
 #include <Adafruit_GFX.h>
-//#include <Adafruit_ST7789.h>
 #include <LittleFS.h>
 #include <Wire.h>
 #include <SPI.h>
 #include <Adafruit_AHTX0.h>
 #include <Adafruit_BMP280.h>
+#include <Adafruit_ST7789.h>
+
 
 //--- WiFi Info/Config ---
 const char SSID[] = "T8-Arduino";
 const char PASSWORD[] = "T8-Arduino";
 
 //--- Screen Info/Config---
-//Adafruit_ST7789 tftScreen = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
+Adafruit_ST7789 TFTScreen = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
 
 //--- AHT and BMP sensors ---
 //Uses I2C interface, no pin declaration needed
 Adafruit_AHTX0 aht; //Tempreature and humidity
 Adafruit_BMP280 bmp; //Tempreature and preassure
+
+//Info
+float TempValue; //Read from AHT, in C units
+float HumidtyValue; //Read from AHT, % RH
+float PreasureValue; //Read from BMP, in hPA units
 
 //LittleFS setup - wants to be first method for some reason?
 void initLittleFS() 
@@ -98,14 +104,8 @@ void setup()
     Serial.print(".");
   }
   Serial.println("..");
-  if (WL_CONNECTED == true) 
-  {
-    Serial.println(WiFi.localIP());
-  } 
-  else 
-  {
-    Serial.println("ERROR: Issues with displaying IP Adress");
-  }
+  Serial.print("IP Address: ");
+  Serial.println(WiFi.localIP());
 
   Serial.println("- WiFi has been initilized successfully -");
 
@@ -128,13 +128,44 @@ void setup()
   }
 
   Serial.println("- Sensors initilized successfully -");
+
+  pinMode(TFT_I2C_POWER, OUTPUT);
+  digitalWrite(TFT_I2C_POWER, HIGH);
+  pinMode(TFT_BACKLITE, OUTPUT);
+  digitalWrite(TFT_BACKLITE, HIGH);
+
+  Serial.println("- Initilizing Screen -");
+  TFTScreen.init(135, 240);
+  TFTScreen.setRotation(3);
+  TFTScreen.fillScreen(ST77XX_WHITE);
+  Serial.println("- Screen initilized successfully -");
+
+  Serial.println();
+  Serial.println("--- SETUP COMPLETED ---");
+  Serial.println();
 }
 
-void loop() {
-  //Test sensor readings
+void loop() 
+{
+  ReadSensors();
+
+  //Read measurement and check limits
+  
+  delay(2000);
+}
+
+void ReadSensors()
+{
+  //Read sensors
   sensors_event_t humidity, temp;
   aht.getEvent(&humidity, &temp);
 
+  //Update sensor values
+  TempValue = temp.temperature;
+  HumidtyValue = humidity.relative_humidity;
+  PreasureValue = bmp.readPressure() / 100.0;
+
+  //Print to serial
   Serial.print("AHT20 Temp: ");
   Serial.print(temp.temperature);
   Serial.print(" °C, Humidity: ");
@@ -146,6 +177,4 @@ void loop() {
   Serial.print(" °C, Pressure: ");
   Serial.print(bmp.readPressure() / 100.0);
   Serial.println(" hPa");
-
-  delay(2000);
 }
