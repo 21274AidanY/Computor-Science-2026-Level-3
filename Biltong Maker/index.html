@@ -26,14 +26,38 @@
 						<div class="number">65%</div>
 					</div>
 				</div>
-				<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="160px" height="160px">
+				
+				<svg class="safe-zone" xmlns="http://www.w3.org/2000/svg" width="180" height="180">
 					<defs>
-						<linearGradient id="GradientColor1">
+						<linearGradient id="SafeZoneGradient">
+							<stop offset="0%" stop-color="#22ff35"/>
+							<stop offset="100%" stop-color="#27843c"/>
+						</linearGradient>
+					</defs>
+
+					<circle
+						cx="90"
+						cy="90"
+						r="75"
+						stroke-linecap="round"
+						stroke="url(#SafeZoneGradient)"
+					/>
+				</svg>
+				<svg class="main-progress" xmlns="http://www.w3.org/2000/svg" width="180" height="180">
+					<defs>
+						<linearGradient id="ProgressGradient">
 							<stop offset="0%" stop-color="#DA22FF"/>
 							<stop offset="100%" stop-color="#9733EE"/>
 						</linearGradient>
 					</defs>
-					<circle cx="80" cy="80" r="70" stroke-linecap="round" stroke="url(#GradientColor1)"/>
+
+					<circle
+						cx="80"
+						cy="80"
+						r="70"
+						stroke-linecap="round"
+						stroke="url(#ProgressGradient)"
+					/>
 				</svg>
 			</div>
 		</div>
@@ -53,7 +77,7 @@
 							<stop offset="100%" stop-color="#2563eb"/>
 						</linearGradient>
 					</defs>
-					<circle cx="80" cy="80" r="70" stroke-linecap="round" stroke="url(#GradientColor2)"/>
+					<circle cx="80" cy="80" r="75" stroke-linecap="round" stroke="url(#GradientColor2)"/>
 				</svg>
 			</div>
 		</div>
