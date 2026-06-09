@@ -30,54 +30,64 @@ body
     justify-content: center;
 }
 
-.skill
+.progressbar
 {
-    width: 160px;
-    height: 160px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.skill{
+    width: 200px;
+    height: 200px;
     position: relative;
+    overflow: visible;
 }
 
-.safe-zone
-{
-    position: absolute;
-    inset: 0;
-    margin: auto;
-
-    width: 180px;
-    height: 180px;
-
-    z-index: 0;
-    transform: rotate(-90deg);
-}
-
-.main-progress
-{
+.skill svg{
     position: absolute;
     top: 0;
     left: 0;
-
-    z-index: 1;
+    width: 160px;
+    height: 160px;
     transform: rotate(-90deg);
+}
+
+.skill .progress-svg{
+    z-index: 3;
+}
+
+.skill .safe-svg{
+    z-index: 1;
 }
 
 .outer
 {
+    width: 150px;
+    height: 145px;
+    padding: 20px;
+    border-radius: 50%;
     position: relative;
     z-index: 2;
+    box-shadow:
+        6px 6px 10px -1px rgba(0,0,0,0.15),
+        6px 6px 10px -1px rgba(255,255,255,0.7);
 }
 
 .inner
 {
-    height: 120px;
-    width: 120px;
-    /*border: 1px solid black;*/
+    height: 100px;
+    width: 100px;
+    margin-left: 0;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: inset 4px 4px 6px -1px rgba(0,0,0,0.2), 
+    box-shadow:
+        inset 4px 4px 6px -1px rgba(0,0,0,0.2), 
         inset -4px -4px 6px -1px rgba(255,255,255,0.7), 
-        -0.5px -0.5px 0px rgba(255,255,255, 1), 
+        -0.5px -0.5px 0px rgba(255,255,255,1), 
         0.5px 0.5px 0px rgba(0,0,0,0.15),
         0px 12px 10px -10px rgba(0,0,0,0.05);
 }
@@ -94,11 +104,4 @@ circle{
     stroke-dasharray: 440;
     stroke-dashoffset: 440;
     stroke-linecap: round;
-}
-
-svg{
-    position: absolute;
-    top: 0;
-    left: 0;
-    transform: rotate(-90deg)
 }

@@ -1,70 +1,78 @@
-// BAR 1
-const slider1 = document.getElementById('slider1');
-const skill1 = document.querySelectorAll('.skill')[0];
-const number1 = skill1.querySelector('.number');
-const circle1 = skill1.querySelector('.main-progress circle');
-
-const circumference1 = 2 * Math.PI * 70;
-
-let current1 = 0;
-let target1 = parseInt(slider1.value);
-
-circle1.style.strokeDasharray = circumference1;
-circle1.style.strokeDashoffset = circumference1;
-
-slider1.addEventListener("input", () => {
-    target1 = parseInt(slider1.value);
-});
-
-function animateBar1()
+function setupRadialBar({
+    skillSelector,
+    sliderId,
+    numberSuffix,
+    safeMin,
+    safeMax
+})
 {
-    current1 += (target1 - current1) * 0.05;
+    const skill = document.querySelector(skillSelector);
+    const slider = document.getElementById(sliderId);
+    const number = skill.querySelector('.number');
 
-    if (Math.abs(target1 - current1) < 0.1)
-        current1 = target1;
+    const circles = skill.querySelectorAll('circle');
+    const mainCircle = circles[0];
+    const safeCircle = circles[1];
 
-    number1.innerHTML = `${Math.round(current1)}°C`;
+    const mainRadius = mainCircle.r.baseVal.value;
+    const safeRadius = safeCircle.r.baseVal.value;
 
-    let offset = circumference1 - (current1 / 100) * circumference1;
-    circle1.style.strokeDashoffset = offset;
+    const mainCircumference = 2 * Math.PI * mainRadius;
+    const safeCircumference = 2 * Math.PI * safeRadius;
 
-    requestAnimationFrame(animateBar1);
+    mainCircle.style.strokeDasharray = mainCircumference;
+    mainCircle.style.strokeDashoffset = mainCircumference;
+
+    safeCircle.style.strokeDasharray = safeCircumference;
+    safeCircle.style.strokeDashoffset = safeCircumference;
+
+    let current = 0;
+    let target = parseFloat(slider.value);
+
+    slider.addEventListener('input', () =>
+    {
+        target = parseFloat(slider.value);
+    });
+
+    function animate()
+    {
+        current += (target - current) * 0.05;
+
+        if (Math.abs(target - current) < 0.1)
+            current = target;
+
+        number.textContent = `${Math.round(current)}${numberSuffix}`;
+
+        const mainOffset = mainCircumference - (current / 100) * mainCircumference;
+        mainCircle.style.strokeDashoffset = mainOffset;
+
+        const safeStart = safeMin / 100;
+        const safeEnd = safeMax / 100;
+
+        const safeLength = (safeEnd - safeStart) * safeCircumference;
+        const safeOffset = safeCircumference - (safeStart * safeCircumference);
+
+        safeCircle.style.strokeDasharray = `${safeLength} ${safeCircumference - safeLength}`;
+        safeCircle.style.strokeDashoffset = safeOffset;
+
+        requestAnimationFrame(animate);
+    }
+
+    animate();
 }
 
-animateBar1();
-
-
-// BAR 2
-const slider2 = document.getElementById('slider2');
-const skill2 = document.querySelectorAll('.skill')[1];
-const number2 = skill2.querySelector('.number');
-const circle2 = skill2.querySelector('svg circle');
-
-const circumference2 = 2 * Math.PI * 70;
-
-let current2 = 0;
-let target2 = parseInt(slider2.value);
-
-circle2.style.strokeDasharray = circumference2;
-circle2.style.strokeDashoffset = circumference2;
-
-slider2.addEventListener("input", () => {
-    target2 = parseInt(slider2.value);
+setupRadialBar({
+    skillSelector: '.skill[data-index="0"]',
+    sliderId: 'slider1',
+    numberSuffix: '°C',
+    safeMin: 45,
+    safeMax: 70
 });
 
-function animateBar2()
-{
-    current2 += (target2 - current2) * 0.05;
-
-    if (Math.abs(target2 - current2) < 0.1)
-        current2 = target2;
-
-    number2.innerHTML = `${Math.round(current2)}%`;
-
-    let offset = circumference2 - (current2 / 100) * circumference2;
-    circle2.style.strokeDashoffset = offset;
-
-    requestAnimationFrame(animateBar2);
-}
-
-animateBar2();
+setupRadialBar({
+    skillSelector: '.skill[data-index="1"]',
+    sliderId: 'slider2',
+    numberSuffix: '%',
+    safeMin: 35,
+    safeMax: 60
+});
