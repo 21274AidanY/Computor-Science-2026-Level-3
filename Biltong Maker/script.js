@@ -1,11 +1,10 @@
 function setupRadialBar({
     skillSelector,
     sliderId,
-    numberSuffix,
-    safeMin,
-    safeMax
-})
-{
+    minSliderId,
+    maxSliderId,
+    numberSuffix
+}) {
     const skill = document.querySelector(skillSelector);
     const slider = document.getElementById(sliderId);
     const number = skill.querySelector('.number');
@@ -29,13 +28,26 @@ function setupRadialBar({
     let current = 0;
     let target = parseFloat(slider.value);
 
-    slider.addEventListener('input', () =>
-    {
+    // LIVE SAFE RANGE VALUES
+    let safeMin = parseFloat(document.getElementById(minSliderId).value);
+    let safeMax = parseFloat(document.getElementById(maxSliderId).value);
+
+    const minSlider = document.getElementById(minSliderId);
+    const maxSlider = document.getElementById(maxSliderId);
+
+    minSlider.addEventListener('input', () => {
+        safeMin = parseFloat(minSlider.value);
+    });
+
+    maxSlider.addEventListener('input', () => {
+        safeMax = parseFloat(maxSlider.value);
+    });
+
+    slider.addEventListener('input', () => {
         target = parseFloat(slider.value);
     });
 
-    function animate()
-    {
+    function animate() {
         current += (target - current) * 0.05;
 
         if (Math.abs(target - current) < 0.1)
@@ -43,17 +55,30 @@ function setupRadialBar({
 
         number.textContent = `${Math.round(current)}${numberSuffix}`;
 
-        const mainOffset = mainCircumference - (current / 100) * mainCircumference;
+        // MAIN progress
+        const mainOffset =
+            mainCircumference - (current / 100) * mainCircumference;
+
         mainCircle.style.strokeDashoffset = mainOffset;
 
+        // SAFE range
+        // convert 0–100 range into circle space
         const safeStart = safeMin / 100;
         const safeEnd = safeMax / 100;
 
-        const safeLength = (safeEnd - safeStart) * safeCircumference;
-        const safeOffset = safeCircumference - (safeStart * safeCircumference);
+        // clamp in case sliders cross
+        const start = Math.min(safeStart, safeEnd);
+        const end = Math.max(safeStart, safeEnd);
 
-        safeCircle.style.strokeDasharray = `${safeLength} ${safeCircumference - safeLength}`;
-        safeCircle.style.strokeDashoffset = safeOffset;
+        // SAFE ARC LENGTH
+        const safeLength = (end - start) * safeCircumference;
+
+        // SAFE ARC POSITION
+        const safeOffset = (start * safeCircumference);
+
+        // draw safe zone as fixed segment
+        safeCircle.style.strokeDasharray = `${safeLength} ${safeCircumference}`;
+        safeCircle.style.strokeDashoffset = -safeOffset;
 
         requestAnimationFrame(animate);
     }
@@ -61,18 +86,30 @@ function setupRadialBar({
     animate();
 }
 
+/* =========================
+   BAR SETUP
+========================= */
+
 setupRadialBar({
     skillSelector: '.skill[data-index="0"]',
     sliderId: 'slider1',
-    numberSuffix: '°C',
-    safeMin: 45,
-    safeMax: 70
+    minSliderId: 'slider1-2',
+    maxSliderId: 'slider2-2',
+    numberSuffix: '°C'
 });
 
 setupRadialBar({
     skillSelector: '.skill[data-index="1"]',
     sliderId: 'slider2',
-    numberSuffix: '%',
-    safeMin: 35,
-    safeMax: 60
+    minSliderId: 'slider1-3',
+    maxSliderId: 'slider2-3',
+    numberSuffix: '%'
+});
+
+setupRadialBar({
+    skillSelector: '.skill[data-index="2"]',
+    sliderId: 'slider1-3',
+    minSliderId: 'slider1-3',
+    maxSliderId: 'slider2-3',
+    numberSuffix: '%'
 });
