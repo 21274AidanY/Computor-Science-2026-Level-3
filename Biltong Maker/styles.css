@@ -47,11 +47,9 @@ body
 
 .skill svg{
     position: absolute;
-    top: 0;
-    left: 0;
     width: 160px;
     height: 160px;
-    transform: rotate(-90deg);
+    transform: rotate(-90deg) translateX(4px) translateY(-4px);
 }
 
 .skill .progress-svg{
@@ -65,11 +63,16 @@ body
 .outer
 {
     width: 150px;
-    height: 145px;
-    padding: 20px;
+    height: 150px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
     border-radius: 50%;
-    position: relative;
+    position: absolute;
     z-index: 2;
+
     box-shadow:
         6px 6px 10px -1px rgba(0,0,0,0.15),
         6px 6px 10px -1px rgba(255,255,255,0.7);
@@ -79,7 +82,6 @@ body
 {
     height: 100px;
     width: 100px;
-    margin-left: 0;
     border-radius: 50%;
     display: flex;
     align-items: center;
