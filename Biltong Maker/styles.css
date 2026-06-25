@@ -39,7 +39,7 @@ body
 }
 
 .skill{
-    width: 200px;
+    width: 110px;
     height: 200px;
     position: relative;
     overflow: visible;
@@ -100,10 +100,31 @@ body
     font-size: 30px;
 }
 
+
 circle{
     fill: none;
     stroke-width: 20px;
     stroke-dasharray: 440;
     stroke-dashoffset: 440;
     stroke-linecap: round;
+    justify-content: center;
+}
+
+.main-progress
+{
+    display: flex;
+}
+
+.bars
+{
+    display: flex;
+    transform: translateX(-60px);
+    background-color: rgba(0,0,0,0.2);
+}
+
+.progressControls {   
+    width: 40px;
+    height: 60px;
+    background-color: cadetblue;
+    transform: translateX(180px) translateY(45px);
 }
