@@ -25,7 +25,8 @@ body
 .bars
 {
     display: flex;
-    gap: 40px;
+    gap: 50px;
+    justify-self: center;
     align-items: center;
     justify-content: center;
 }
@@ -113,6 +114,7 @@ circle{
 .main-progress
 {
     display: flex;
+    width: 190px;
 }
 
 .bars
@@ -125,6 +127,8 @@ circle{
 .progressControls {   
     width: 40px;
     height: 60px;
-    background-color: cadetblue;
-    transform: translateX(180px) translateY(45px);
+    z-index: 3;
+    border-radius: 10%;
+    background-color: white;
+    transform: translateX(35px) translateY(45px);
 }

@@ -9,11 +9,20 @@
 #include <Adafruit_AHTX0.h>
 #include <Adafruit_BMP280.h>
 #include <Adafruit_ST7789.h>
+#include <AsyncTCP.h>
+#include <ESPAsyncWebServer.h>
+#include <Arduino_JSON.h>
 
 
 //--- WiFi Info/Config ---
 const char SSID[] = "T8-Arduino";
 const char PASSWORD[] = "T8-Arduino";
+
+//------------- WebServer setup --------------
+//Create an async web server on port 80
+AsyncWebServer server(80);
+// Create a WebSocket object
+AsyncWebSocket ws("/ws");
 
 //--- Screen Info/Config---
 Adafruit_ST7789 TFTScreen = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
@@ -80,6 +89,87 @@ void writeFile(fs::FS& fs, const char* path, const char* message)
   {
     Serial.println("- writeFile failed");
   }
+}
+
+/**
+set up a JSON array and hold the states of all values we care about
+pins and their current states variables and their current values
+*/
+String getOutputStates() {
+  JSONVar myArray;
+
+  myArray["values"][0]["humidty"] = String(1);
+  myArray["values"][0]["temp"] = String(1);
+
+  String jsonString = JSON.stringify(myArray);
+  return jsonString;
+}
+
+/**
+Sends a message to all clients connected to ip address with a JSON message
+*/
+void notifyClients(String state) {
+  ws.textAll(state);
+}
+
+/**
+Handles messages from clients in the if statements below
+*/
+void handleWebSocketMessage(void* arg, uint8_t* data, size_t len) {
+  AwsFrameInfo* info = (AwsFrameInfo*)arg;
+  if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
+    data[len] = 0;
+    //if message is states send the state of all gpio pins
+    if (strcmp((char*)data, "getStates") == 0) {
+      notifyClients(getOutputStates());
+    } else {
+      //(char*)data should be in this format "rgb(255,87,51)" when it isn't 'getStates'
+      std::string rgb = (char*)data;
+      byte firstComma = rgb.find(',');
+      byte secondComma = rgb.find(',', firstComma + 1);
+      byte lastBracket = rgb.find(')');
+    }
+    //Just to alternate the led on and off to show we can digitalRead and digitalWrite here
+    //digitalWrite(LEDPIN, !digitalRead(LEDPIN)); //AM I AN ISSUE NEED TO TEST--------------------------------------
+  }
+}
+
+/**
+Event listener handles different asyncronous steps from the web socket
+*/
+void onEvent(AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data, size_t len) {
+  switch (type) {
+    case WS_EVT_CONNECT:
+      //Serial.printf("WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
+      Serial.print("WebSocket client ");
+      Serial.print(client->id());
+      Serial.print(" connected from ");
+      Serial.println(client->remoteIP().toString().c_str());
+      break;
+    case WS_EVT_DISCONNECT:
+      //Serial.printf("WebSocket client #%u disconnected\n", client->id());
+      Serial.print("WebSocket client ");
+      Serial.print(client->id());
+      Serial.println(" disconnected\n");
+      break;
+    case WS_EVT_DATA:
+      handleWebSocketMessage(arg, data, len);
+      break;
+    case WS_EVT_PONG:
+    case WS_EVT_ERROR:
+      break;
+  }
+}
+
+
+/**
+WebSocket setup
+What to do when an event happens on the ws socket and adding a handler to the server
+*/
+void initWebSocket() {
+  ws.onEvent(onEvent);
+  server.addHandler(&ws);
+  Serial.println("websocket should be running now");
 }
 
 void setup() 
