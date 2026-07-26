@@ -25,10 +25,10 @@ body
 .bars
 {
     display: flex;
-    gap: 50px;
     justify-self: center;
     align-items: center;
     justify-content: center;
+    background-color: rgba(0,0,0,0.2);
 }
 
 .progressbar
@@ -115,13 +115,6 @@ circle{
 {
     display: flex;
     width: 190px;
-}
-
-.bars
-{
-    display: flex;
-    transform: translateX(-60px);
-    background-color: rgba(0,0,0,0.2);
 }
 
 .progressControls {   
