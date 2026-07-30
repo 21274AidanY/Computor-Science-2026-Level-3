@@ -25,10 +25,10 @@ body
 .bars
 {
     display: flex;
+    flex-wrap: wrap;
     justify-self: center;
     align-items: center;
     justify-content: center;
-    background-color: rgba(0,0,0,0.2);
 }
 
 .progressbar
@@ -50,7 +50,7 @@ body
     position: absolute;
     width: 160px;
     height: 160px;
-    transform: rotate(-90deg) translateX(4px) translateY(-4px);
+    transform: rotate(-90deg) translateX(5px) translateY(-6px);
 }
 
 .skill .progress-svg{
@@ -97,7 +97,7 @@ body
 
 .number{
     font-weight: 600;
-    color: dimgrey;
+    color: black;
     font-size: 30px;
 }
 
@@ -123,5 +123,5 @@ circle{
     z-index: 3;
     border-radius: 10%;
     background-color: white;
-    transform: translateX(35px) translateY(45px);
+    transform: translateX(35px) translateY(8px);
 }

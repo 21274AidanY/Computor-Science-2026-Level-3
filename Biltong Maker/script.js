@@ -34,6 +34,10 @@ function setupRadialBar({
 
     const minSlider = document.getElementById(minSliderId);
     const maxSlider = document.getElementById(maxSliderId);
+    const mainProgress = skill.closest(".main-progress");
+    const controls = mainProgress.querySelector(".progressControls");
+
+    const [upMax, downMax, upMin, downMin] = controls.querySelectorAll("button");
 
     minSlider.addEventListener('input', () => {
         safeMin = parseFloat(minSlider.value);
@@ -65,7 +69,7 @@ function setupRadialBar({
         // convert 0–100 range into circle space
         const safeStart = safeMin / 100;
         const safeEnd = safeMax / 100;
-
+        
         // clamp in case sliders cross
         const start = Math.min(safeStart, safeEnd);
         const end = Math.max(safeStart, safeEnd);
