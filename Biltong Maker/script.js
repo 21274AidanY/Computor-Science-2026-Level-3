@@ -46,9 +46,35 @@ function setupRadialBar({
     maxSlider.addEventListener('input', () => {
         safeMax = parseFloat(maxSlider.value);
     });
+    
+    maxSlider.addEventListener('input', () => {
+    safeMax = parseFloat(maxSlider.value);
+    });
 
     slider.addEventListener('input', () => {
         target = parseFloat(slider.value);
+    });
+    
+    const step = 5; // how much each click changes the value by
+
+    upMax.addEventListener('click', () => {
+        maxSlider.value = Math.min(parseFloat(maxSlider.max), parseFloat(maxSlider.value) + step);
+        safeMax = parseFloat(maxSlider.value);
+    });
+
+    downMax.addEventListener('click', () => {
+        maxSlider.value = Math.max(parseFloat(maxSlider.min), parseFloat(maxSlider.value) - step);
+        safeMax = parseFloat(maxSlider.value);
+    });
+
+    upMin.addEventListener('click', () => {
+        minSlider.value = Math.min(parseFloat(minSlider.max), parseFloat(minSlider.value) + step);
+        safeMin = parseFloat(minSlider.value);
+    });
+
+    downMin.addEventListener('click', () => {
+        minSlider.value = Math.max(parseFloat(minSlider.min), parseFloat(minSlider.value) - step);
+        safeMin = parseFloat(minSlider.value);
     });
 
     function animate() {
