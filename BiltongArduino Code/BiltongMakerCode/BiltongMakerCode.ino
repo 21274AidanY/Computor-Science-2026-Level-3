@@ -12,6 +12,7 @@
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <Arduino_JSON.h>
+#include <ESPmDNS.h>
 
 
 //--- WiFi Info/Config ---
@@ -95,11 +96,12 @@ void writeFile(fs::FS& fs, const char* path, const char* message)
 set up a JSON array and hold the states of all values we care about
 pins and their current states variables and their current values
 */
-String getOutputStates() {
+String getOutputStates() 
+{
   JSONVar myArray;
 
-  myArray["values"][0]["humidty"] = String(1);
-  myArray["values"][0]["temp"] = String(1);
+  myArray["values"][0]["humidity"] = String(HumidtyValue);
+  myArray["values"][0]["temp"] = String(TempValue);
 
   String jsonString = JSON.stringify(myArray);
   return jsonString;
@@ -199,6 +201,13 @@ void setup()
 
   Serial.println("- WiFi has been initilized successfully -");
 
+  // --- mDNS setup ---
+  if (!MDNS.begin("biltongmaker")) {  // <-- this becomes "biltongmaker.local"
+    Serial.println("Error starting mDNS");
+  } else {
+    Serial.println("mDNS responder started: http://biltongmaker.local");
+  }
+
   Serial.println("- Initilizing LittleFS -");
   initLittleFS();
 
@@ -216,6 +225,14 @@ void setup()
     Serial.println("BMP280 not found at 0x77!");
     while (1);
   }
+
+  Serial.println("- Initilizing WebServer -");
+
+  server.serveStatic("/", LittleFS, "/").setDefaultFile("index.html");
+
+  initWebSocket();
+  server.begin();
+  Serial.println("- WebServer initilized successfully -");
 
   Serial.println("- Sensors initilized successfully -");
 
@@ -238,6 +255,7 @@ void setup()
 void loop() 
 {
   ReadSensors();
+  notifyClients(getOutputStates());
 
   //Read measurement and check limits
   

@@ -76,6 +76,29 @@ function setupRadialBar({
         minSlider.value = Math.max(parseFloat(minSlider.min), parseFloat(minSlider.value) - step);
         safeMin = parseFloat(minSlider.value);
     });
+    
+    socket.addEventListener('open', () => {
+        console.log("Connected to ESP32");
+        socket.send("getStates");
+    });
+
+    socket.addEventListener('message', (event) => {
+        console.log("RAW MESSAGE:", event.data); // <-- NEW
+        try {
+            const data = JSON.parse(event.data);
+            console.log("PARSED:", data); // <-- NEW
+            const reading = data.values[0];
+            console.log("READING:", reading); // <-- NEW
+            tempBar.setValue(reading.temp);
+            humidityBar.setValue(reading.humidity);
+        } catch (err) {
+            console.error("Bad WebSocket message:", event.data, err);
+        }
+    });
+
+    socket.addEventListener('error', (err) => {
+        console.error("WebSocket error:", err); // <-- NEW
+    });
 
     function animate() {
         current += (target - current) * 0.05;
@@ -114,13 +137,20 @@ function setupRadialBar({
     }
 
     animate();
+    
+    return {
+        setValue(value) {
+            slider.value = value;
+            target = parseFloat(value);
+        }
+    };
 }
 
 /* =========================
    BAR SETUP
 ========================= */
 
-setupRadialBar({
+const tempBar = setupRadialBar({
     skillSelector: '.skill[data-index="0"]',
     sliderId: 'slider1',
     minSliderId: 'slider1-2',
@@ -128,7 +158,7 @@ setupRadialBar({
     numberSuffix: '°C'
 });
 
-setupRadialBar({
+const humidityBar = setupRadialBar({
     skillSelector: '.skill[data-index="1"]',
     sliderId: 'slider2',
     minSliderId: 'slider1-3',
@@ -136,10 +166,28 @@ setupRadialBar({
     numberSuffix: '%'
 });
 
-setupRadialBar({
-    skillSelector: '.skill[data-index="2"]',
-    sliderId: 'slider1-3',
-    minSliderId: 'slider1-3',
-    maxSliderId: 'slider2-3',
-    numberSuffix: '%'
+/* =========================
+   ESP32 WEBSOCKET CONNECTION
+========================= */
+const socket = new WebSocket(`ws://${location.host}/ws`);
+
+socket.addEventListener('open', () => {
+    console.log("Connected to ESP32");
+    socket.send("getStates"); // ask for an immediate reading
+});
+
+socket.addEventListener('message', (event) => {
+    try {
+        const data = JSON.parse(event.data);
+        const reading = data.values[0];
+
+        tempBar.setValue(reading.temp);
+        humidityBar.setValue(reading.humidity);
+    } catch (err) {
+        console.error("Bad WebSocket message:", event.data, err);
+    }
+});
+
+socket.addEventListener('close', () => {
+    console.log("Disconnected from ESP32");
 });
