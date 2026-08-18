@@ -1,3 +1,39 @@
+/* =========================
+   ESP32 WEBSOCKET CONNECTION
+   (must be declared before setupRadialBar is called,
+   since the message handler references tempBar/humidityBar
+   which are only *used*, not *called*, at message time)
+========================= */
+const socket = new WebSocket(`ws://${location.host}/ws`);
+
+socket.addEventListener('open', () => {
+    console.log("Connected to ESP32");
+    socket.send("getStates"); // ask for an immediate reading
+});
+
+socket.addEventListener('message', (event) => {
+    console.log("RAW MESSAGE:", event.data);
+    try {
+        const data = JSON.parse(event.data);
+        console.log("PARSED:", data);
+        const reading = data.values[0];
+        console.log("READING:", reading);
+
+        tempBar.setValue(reading.temp);
+        humidityBar.setValue(reading.humidity);
+    } catch (err) {
+        console.error("Bad WebSocket message:", event.data, err);
+    }
+});
+
+socket.addEventListener('close', () => {
+    console.log("Disconnected from ESP32");
+});
+
+socket.addEventListener('error', (err) => {
+    console.error("WebSocket error:", err);
+});
+
 function setupRadialBar({
     skillSelector,
     sliderId,
@@ -46,15 +82,11 @@ function setupRadialBar({
     maxSlider.addEventListener('input', () => {
         safeMax = parseFloat(maxSlider.value);
     });
-    
-    maxSlider.addEventListener('input', () => {
-    safeMax = parseFloat(maxSlider.value);
-    });
 
     slider.addEventListener('input', () => {
         target = parseFloat(slider.value);
     });
-    
+
     const step = 5; // how much each click changes the value by
 
     upMax.addEventListener('click', () => {
@@ -76,29 +108,6 @@ function setupRadialBar({
         minSlider.value = Math.max(parseFloat(minSlider.min), parseFloat(minSlider.value) - step);
         safeMin = parseFloat(minSlider.value);
     });
-    
-    socket.addEventListener('open', () => {
-        console.log("Connected to ESP32");
-        socket.send("getStates");
-    });
-
-    socket.addEventListener('message', (event) => {
-        console.log("RAW MESSAGE:", event.data); // <-- NEW
-        try {
-            const data = JSON.parse(event.data);
-            console.log("PARSED:", data); // <-- NEW
-            const reading = data.values[0];
-            console.log("READING:", reading); // <-- NEW
-            tempBar.setValue(reading.temp);
-            humidityBar.setValue(reading.humidity);
-        } catch (err) {
-            console.error("Bad WebSocket message:", event.data, err);
-        }
-    });
-
-    socket.addEventListener('error', (err) => {
-        console.error("WebSocket error:", err); // <-- NEW
-    });
 
     function animate() {
         current += (target - current) * 0.05;
@@ -118,7 +127,7 @@ function setupRadialBar({
         // convert 0–100 range into circle space
         const safeStart = safeMin / 100;
         const safeEnd = safeMax / 100;
-        
+
         // clamp in case sliders cross
         const start = Math.min(safeStart, safeEnd);
         const end = Math.max(safeStart, safeEnd);
@@ -137,7 +146,7 @@ function setupRadialBar({
     }
 
     animate();
-    
+
     return {
         setValue(value) {
             slider.value = value;
@@ -164,30 +173,4 @@ const humidityBar = setupRadialBar({
     minSliderId: 'slider1-3',
     maxSliderId: 'slider2-3',
     numberSuffix: '%'
-});
-
-/* =========================
-   ESP32 WEBSOCKET CONNECTION
-========================= */
-const socket = new WebSocket(`ws://${location.host}/ws`);
-
-socket.addEventListener('open', () => {
-    console.log("Connected to ESP32");
-    socket.send("getStates"); // ask for an immediate reading
-});
-
-socket.addEventListener('message', (event) => {
-    try {
-        const data = JSON.parse(event.data);
-        const reading = data.values[0];
-
-        tempBar.setValue(reading.temp);
-        humidityBar.setValue(reading.humidity);
-    } catch (err) {
-        console.error("Bad WebSocket message:", event.data, err);
-    }
-});
-
-socket.addEventListener('close', () => {
-    console.log("Disconnected from ESP32");
 });
