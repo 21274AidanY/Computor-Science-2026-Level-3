@@ -33,6 +33,9 @@ Adafruit_ST7789 TFTScreen = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
 Adafruit_AHTX0 aht; //Tempreature and humidity
 Adafruit_BMP280 bmp; //Tempreature and preassure
 
+byte FanPIN;
+byte LampPIN;
+
 //Info
 float TempValue; //Read from AHT, in C units
 float HumidtyValue; //Read from AHT, % RH
@@ -254,12 +257,33 @@ void setup()
 
 void loop() 
 {
+  //read all sensor values
   ReadSensors();
+  
+  CheckRanges(TempValue,0,0);
+  CheckRanges(HumidtyValue,0,0);
+  CheckRanges(PreasureValue,0,0);
+
   notifyClients(getOutputStates());
 
   //Read measurement and check limits
   
   delay(2000);
+}
+
+//This method checks the data of choice and compares them to its ranges. It then reports back with a number to signify how it should react. (e.g. 1, increase data to fit range. -1, decrease data to fit range. 0 data fits range)
+byte CheckRanges(float Data, float Min, float Max)
+{
+  if (Data >= Max)
+  {
+    return -1;
+  }
+  else if (Data <= Min)
+  {
+    return 1;
+  }
+
+  return 0;
 }
 
 void ReadSensors()
