@@ -4,13 +4,17 @@
    since the message handler references tempBar/humidityBar
    which are only *used*, not *called*, at message time)
 ========================= */
-const socket = new WebSocket(`ws://${location.host}/ws`);
 
+//HAN COMMENT I have added a comment for every event listener and function
+
+const socket = new WebSocket(`ws://${location.host}/ws`);
+//HAN COMMENT what does this chunk of code do?
 socket.addEventListener('open', () => {
     console.log("Connected to ESP32");
     socket.send("getStates"); // ask for an immediate reading
 });
 
+//HAN COMMENT what does this chunk of code do?
 socket.addEventListener('message', (event) => {
     console.log("RAW MESSAGE:", event.data);
     try {
@@ -26,21 +30,24 @@ socket.addEventListener('message', (event) => {
     }
 });
 
+//HAN COMMENT what does this chunk of code do?
 socket.addEventListener('close', () => {
     console.log("Disconnected from ESP32");
 });
 
+//HAN COMMENT what does this chunk of code do?
 socket.addEventListener('error', (err) => {
     console.error("WebSocket error:", err);
 });
 
+//HAN COMMENT what does this chunk of code do?
 function setupRadialBar({
     skillSelector,
     sliderId,
     minSliderId,
     maxSliderId,
     numberSuffix
-}) {
+}) { //HAN COMMENT is the { needed? it might be, i am just reading the code direct in github
     const skill = document.querySelector(skillSelector);
     const slider = document.getElementById(sliderId);
     const number = skill.querySelector('.number');
@@ -74,41 +81,41 @@ function setupRadialBar({
     const controls = mainProgress.querySelector(".progressControls");
 
     const [upMax, downMax, upMin, downMin] = controls.querySelectorAll("button");
-
+//HAN COMMENT what does this chunk of code do?
     minSlider.addEventListener('input', () => {
         safeMin = parseFloat(minSlider.value);
     });
-
+//HAN COMMENT what does this chunk of code do?
     maxSlider.addEventListener('input', () => {
         safeMax = parseFloat(maxSlider.value);
     });
-
+//HAN COMMENT what does this chunk of code do?
     slider.addEventListener('input', () => {
         target = parseFloat(slider.value);
     });
 
     const step = 5; // how much each click changes the value by
-
+//HAN COMMENT what does this chunk of code do?
     upMax.addEventListener('click', () => {
         maxSlider.value = Math.min(parseFloat(maxSlider.max), parseFloat(maxSlider.value) + step);
         safeMax = parseFloat(maxSlider.value);
     });
-
+//HAN COMMENT what does this chunk of code do?
     downMax.addEventListener('click', () => {
         maxSlider.value = Math.max(parseFloat(maxSlider.min), parseFloat(maxSlider.value) - step);
         safeMax = parseFloat(maxSlider.value);
     });
-
+//HAN COMMENT what does this chunk of code do?
     upMin.addEventListener('click', () => {
         minSlider.value = Math.min(parseFloat(minSlider.max), parseFloat(minSlider.value) + step);
         safeMin = parseFloat(minSlider.value);
     });
-
+//HAN COMMENT what does this chunk of code do?
     downMin.addEventListener('click', () => {
         minSlider.value = Math.max(parseFloat(minSlider.min), parseFloat(minSlider.value) - step);
         safeMin = parseFloat(minSlider.value);
     });
-
+//HAN COMMENT what does this chunk of code do?
     function animate() {
         current += (target - current) * 0.05;
 
