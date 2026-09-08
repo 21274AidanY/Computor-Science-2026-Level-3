@@ -128,6 +128,7 @@ void handleWebSocketMessage(void* arg, uint8_t* data, size_t len) {
     if (strcmp((char*)data, "getStates") == 0) {
       notifyClients(getOutputStates());
     } else {
+      //HAN COMMENT is the next 10 lines of code still needed? or does it need some adjustment?
       //(char*)data should be in this format "rgb(255,87,51)" when it isn't 'getStates'
       std::string rgb = (char*)data;
       byte firstComma = rgb.find(',');
@@ -177,6 +178,7 @@ void initWebSocket() {
   Serial.println("websocket should be running now");
 }
 
+//HAN COMMENT tell me what setup is setting up
 void setup() 
 {
   //Initilize serial monitor and wait
@@ -255,6 +257,7 @@ void setup()
   Serial.println();
 }
 
+//HAN COMMENT tell me the overview of what happens in this loop
 void loop() 
 {
   //read all sensor values
@@ -286,6 +289,7 @@ byte CheckRanges(float Data, float Min, float Max)
   return 0;
 }
 
+//HAN COMMENT what does this method do? and do we need to do anything with the tft screen?
 void ReadSensors()
 {
   //Read sensors
