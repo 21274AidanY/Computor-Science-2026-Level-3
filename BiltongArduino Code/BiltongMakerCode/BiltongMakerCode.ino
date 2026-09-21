@@ -263,9 +263,9 @@ void loop()
   //read all sensor values
   ReadSensors();
   
-  CheckRanges(TempValue,0,0);
-  CheckRanges(HumidtyValue,0,0);
-  CheckRanges(PreasureValue,0,0);
+  byte TempResponse = CheckRanges(TempValue,0,0);
+  byte HumidtyResponse = CheckRanges(HumidtyValue,0,0);
+  byte PressureResponse = CheckRanges(PreasureValue,0,0);
 
   notifyClients(getOutputStates());
 
