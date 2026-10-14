@@ -27,7 +27,6 @@ body
 
 .bars
 {
-    background-color: rgba(0,0,200,0.07);
     display: flex;
     flex-wrap: wrap;
     justify-self: center;
@@ -129,3 +128,60 @@ circle{
     background-color: white;
     transform: translateX(35px) translateY(8px);
 }
+
+/* Container for the toggle switch */
+.toggle-switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+/* Hide the default browser checkbox */
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider track background */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  border-radius: 34px;
+  transition: background-color 0.3s ease;
+}
+
+/* The circular thumb (the moving knob) */
+.slider::before {
+  content: "";
+  position: absolute;
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+}
+
+/* Background color changes when the checkbox is checked */
+.toggle-switch input:checked + .slider {
+  background-color: #2196F3; /* Modern Blue */
+}
+
+/* Moves the knob to the right when checked */
+.toggle-switch input:checked + .slider::before {
+  transform: translateX(26px);
+}
+
+/* Optional: Add focus indicator outlines for keyboard accessibility */
+.toggle-switch input:focus-visible + .slider {
+  box-shadow: 0 0 5px #2196F3;
+}
+
