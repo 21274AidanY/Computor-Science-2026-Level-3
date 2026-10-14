@@ -27,6 +27,7 @@ body
 
 .bars
 {
+    background-color: rgba(0,0,200,0.07);
     display: flex;
     flex-wrap: wrap;
     justify-self: center;
