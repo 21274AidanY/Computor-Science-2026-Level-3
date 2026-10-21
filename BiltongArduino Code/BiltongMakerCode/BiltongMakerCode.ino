@@ -16,8 +16,8 @@
 
 
 //--- WiFi Info/Config ---
-const char SSID[] = "T8-Arduino";
-const char PASSWORD[] = "T8-Arduino";
+const char SSID[] = "KANDY";
+const char PASSWORD[] = "Br33andA1dan";
 
 //------------- WebServer setup --------------
 //Create an async web server on port 80
@@ -46,12 +46,17 @@ void initLittleFS()
 {
   if (!LittleFS.begin(true)) 
   {
-    Serial.println("- LittleFS failed to initilize -");
-  } 
-  else 
-  {
-    Serial.println("- LittleFS has been initilized successfully -");
+    Serial.println("LittleFS mount failed!");
+    return;
   }
+
+  Serial.println("LittleFS mounted successfully!");
+
+  Serial.print("index.html exists: ");
+  Serial.println(LittleFS.exists("/index.html"));
+
+  Serial.print("Total filesystem bytes: ");
+  Serial.println(LittleFS.totalBytes());
 }
 
 //LittleFS reading a file 
@@ -215,6 +220,14 @@ void setup()
 
   Serial.println("- Initilizing LittleFS -");
   initLittleFS();
+
+  Serial.println("Checking website files:");
+
+  Serial.print("index.html exists: ");
+  Serial.println(LittleFS.exists("/index.html"));
+
+  Serial.print("File system total bytes: ");
+  Serial.println(LittleFS.totalBytes());
 
   Serial.println("- Initilizing Sensors -");
   // AHT20 initilize
