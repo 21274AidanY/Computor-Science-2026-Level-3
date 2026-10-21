@@ -33,8 +33,15 @@ Adafruit_ST7789 TFTScreen = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
 Adafruit_AHTX0 aht; //Tempreature and humidity
 Adafruit_BMP280 bmp; //Tempreature and preassure
 
+//Pins
 byte FanPIN;
 byte LampPIN;
+
+//Settings
+float TempMin;
+float TempMax;
+float HumidMin;
+float HumidMax;
 
 //Info
 float TempValue; //Read from AHT, in C units
@@ -125,31 +132,63 @@ void notifyClients(String state) {
 /**
 Handles messages from clients in the if statements below
 */
-void handleWebSocketMessage(void* arg, uint8_t* data, size_t len) {
+void handleWebSocketMessage(void* arg, uint8_t* data, size_t len) 
+{
   AwsFrameInfo* info = (AwsFrameInfo*)arg;
-  if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) {
-    data[len] = 0;
-    //if message is states send the state of all gpio pins
-    if (strcmp((char*)data, "getStates") == 0) {
-      notifyClients(getOutputStates());
-    } else {
-      //HAN COMMENT is the next 10 lines of code still needed? or does it need some adjustment?
-      //(char*)data should be in this format "rgb(255,87,51)" when it isn't 'getStates'
-      std::string rgb = (char*)data;
-      byte firstComma = rgb.find(',');
-      byte secondComma = rgb.find(',', firstComma + 1);
-      byte lastBracket = rgb.find(')');
+
+  if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) 
+  {
+
+    // Convert the received bytes into a null-terminated string.
+    String message;
+    message.reserve(len);
+    for (size_t i = 0; i < len; i++) {
+      message += (char)data[i];
     }
-    //Just to alternate the led on and off to show we can digitalRead and digitalWrite here
-    //digitalWrite(LEDPIN, !digitalRead(LEDPIN)); //AM I AN ISSUE NEED TO TEST--------------------------------------
+
+    // Handle the original request for sensor readings.
+    if (message == "getStates") {
+      notifyClients(getOutputStates());
+      return;
+    }
+
+    // Convert the JSON text into a JSON object.
+    JSONVar json = JSON.parse(message);
+
+    // Ignore invalid JSON.
+    if (JSON.typeof(json) == "undefined") 
+    {
+      Serial.println("Invalid JSON received");
+      return;
+    }
+
+    // Check whether this is a settings update.
+    if (JSON.typeof(json["type"]) == "string") 
+    {
+      String messageType = (const char*)json["type"];
+
+      if (messageType == "settings") 
+      {
+          TempMin = (double)json["TempMin"];
+          TempMax = (double)json["TempMax"];
+          HumidMin = (double)json["HumidMin"];
+          HumidMax = (double)json["HumidMax"];
+
+          Serial.println("Settings updated:");
+          Serial.printf("Temperature: %.1f - %.1f\n", TempMin, TempMax);
+          Serial.printf("Humidity: %.1f - %.1f\n", HumidMin, HumidMax);
+      }
+    }
   }
 }
 
 /**
 Event listener handles different asyncronous steps from the web socket
 */
-void onEvent(AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data, size_t len) {
-  switch (type) {
+void onEvent(AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data, size_t len) 
+{
+  switch (type) 
+  {
     case WS_EVT_CONNECT:
       //Serial.printf("WebSocket client #%u connected from %s\n", client->id(), client->remoteIP().toString().c_str());
       Serial.print("WebSocket client ");

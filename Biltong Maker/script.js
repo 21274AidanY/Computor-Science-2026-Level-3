@@ -9,8 +9,19 @@
 
 const socket = new WebSocket(`ws://${location.host}/ws`);
 
-//HAN COMMENT what does this chunk of code do?
+function sendSettings() {
+    if (socket.readyState !== WebSocket.OPEN) return;
 
+    socket.send(JSON.stringify({
+        type: "settings",
+        TempMin: tempBar.getMin(),
+        TempMax: tempBar.getMax(),
+        HumidMin: humidityBar.getMin(),
+        HumidMax: humidityBar.getMax()
+    }));
+}
+
+//HAN COMMENT what does this chunk of code do?
 function setupRadialBar({
     skillSelector,
     minSliderId,
@@ -50,21 +61,26 @@ function setupRadialBar({
         controls.querySelectorAll("button");
 
     const step = 5;
-
+    
+    //Range control buttons, change their max or min and then send the new values using sendSettings();
     upMax.addEventListener('click', () => {
         safeMax = Math.min(100, safeMax + step);
+        sendSettings();
     });
 
     downMax.addEventListener('click', () => {
         safeMax = Math.max(0, safeMax - step);
+        sendSettings();
     });
 
     upMin.addEventListener('click', () => {
         safeMin = Math.min(100, safeMin + step);
+        sendSettings();
     });
 
     downMin.addEventListener('click', () => {
         safeMin = Math.max(0, safeMin - step);
+        sendSettings();
     });
 
     function animate() {
@@ -97,12 +113,21 @@ function setupRadialBar({
     }
 
     animate();
-
+    
+    //Expose info
     return {
-        setValue(value) {
-            target = Math.max(0, Math.min(100, Number(value) || 0));
-        }
-    };
+    setValue(value) {
+        target = Math.max(0, Math.min(100, Number(value) || 0));
+    },
+
+    getMin() {
+        return safeMin;
+    },
+
+    getMax() {
+        return safeMax;
+    }
+};
 }
 
 
@@ -129,14 +154,24 @@ socket.addEventListener('open', () => {
 //HAN COMMENT what does this chunk of code do?
 socket.addEventListener('message', (event) => {
     console.log("RAW MESSAGE:", event.data);
+
     try {
         const data = JSON.parse(event.data);
         console.log("PARSED:", data);
-        const reading = data.values[0];
-        console.log("READING:", reading);
 
-        tempBar.setValue(reading.temp);
-        humidityBar.setValue(reading.humidity);
+        // Handle sensor readings from the ESP32.
+        if (data.values) {
+            const reading = data.values[0];
+
+            tempBar.setValue(reading.temp);
+            humidityBar.setValue(reading.humidity);
+        }
+
+        // Settings messages can be handled separately if needed.
+        else if (data.type === "settings") {
+            console.log("Settings received:", data);
+        }
+
     } catch (err) {
         console.error("Bad WebSocket message:", event.data, err);
     }
