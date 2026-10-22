@@ -16,8 +16,8 @@
 
 
 //--- WiFi Info/Config ---
-const char SSID[] = "KANDY";
-const char PASSWORD[] = "Br33andA1dan";
+const char SSID[] = "T8-Arduino";
+const char PASSWORD[] = "T8-Arduino";
 
 //------------- WebServer setup --------------
 //Create an async web server on port 80
@@ -34,8 +34,8 @@ Adafruit_AHTX0 aht; //Tempreature and humidity
 Adafruit_BMP280 bmp; //Tempreature and preassure
 
 //Pins
-byte FanPIN;
-byte LampPIN;
+byte FanPIN = 9;
+byte LampPIN = 10;
 
 //Settings
 float TempMin;
@@ -48,7 +48,10 @@ bool autoControl = true;
 //Info
 float TempValue; //Read from AHT, in C units
 float HumidtyValue; //Read from AHT, % RH
-float PreasureValue; //Read from BMP, in hPA units
+//float PreasureValue; //Read from BMP, in hPA units
+
+bool isHeating; //Is it currently trying to heat with the lamp
+bool isDrying; //Is it currenntly trying to dry with the fan
 
 //LittleFS setup - wants to be first method for some reason?
 void initLittleFS() 
@@ -231,6 +234,12 @@ void initWebSocket() {
 //HAN COMMENT tell me what setup is setting up
 void setup() 
 {
+  pinMode(FanPIN, OUTPUT);
+  pinMode(LampPIN, OUTPUT);
+
+  digitalWrite(FanPIN, LOW);
+  digitalWrite(LampPIN, LOW);
+
   //Initilize serial monitor and wait
   Serial.begin(115200);
   while (!Serial) 
@@ -316,35 +325,70 @@ void setup()
 }
 
 //HAN COMMENT tell me the overview of what happens in this loop
-void loop() 
-{
-  //read all sensor values
-  ReadSensors();
-  
-  byte TempResponse = CheckRanges(TempValue,0,0);
-  byte HumidtyResponse = CheckRanges(HumidtyValue,0,0);
-  byte PressureResponse = CheckRanges(PreasureValue,0,0);
 
+void loop()
+{
+  // Read current temperature and humidity
+  ReadSensors();
+
+  if (autoControl)
+  {
+    // HEAT LAMP:
+    // Turn on below minimum, stay on until maximum is reached.
+    if (TempValue <= TempMin)
+    {
+      isHeating = true;
+    }
+    else if (TempValue >= TempMax)
+    {
+      isHeating = false;
+    }
+
+    // FAN:
+    // Turn on above maximum, stay on until minimum is reached.
+    if (HumidtyValue >= HumidMax)
+    {
+      isDrying = true;
+    }
+    else if (HumidtyValue <= HumidMin)
+    {
+      isDrying = false;
+    }
+
+    // Apply the output states
+    digitalWrite(LampPIN, isHeating ? HIGH : LOW);
+    digitalWrite(FanPIN, isDrying ? HIGH : LOW);
+  }
+  else
+  {
+    // Automatic control disabled: turn both outputs off
+    isHeating = false;
+    isDrying = false;
+
+    digitalWrite(LampPIN, LOW);
+    digitalWrite(FanPIN, LOW);
+  }
+
+  // Send current readings and output states to the website
   notifyClients(getOutputStates());
 
-  //Read measurement and check limits
-  
   delay(2000);
 }
 
+
 //This method checks the data of choice and compares them to its ranges. It then reports back with a number to signify how it should react. (e.g. 1, increase data to fit range. -1, decrease data to fit range. 0 data fits range)
-byte CheckRanges(float Data, float Min, float Max)
+int CheckRanges(float Data, float Min, float Max)
 {
   if (Data >= Max)
   {
-    return -1;
+    return -1; // Data is too high
   }
   else if (Data <= Min)
   {
-    return 1;
+    return 1; // Data is too low
   }
 
-  return 0;
+  return 0; // Data is within range
 }
 
 //HAN COMMENT what does this method do? and do we need to do anything with the tft screen?
@@ -357,7 +401,7 @@ void ReadSensors()
   //Update sensor values
   TempValue = temp.temperature;
   HumidtyValue = humidity.relative_humidity;
-  PreasureValue = bmp.readPressure() / 100.0;
+  //PreasureValue = bmp.readPressure() / 100.0;
 
   //Print to serial
   Serial.print("AHT20 Temp: ");
