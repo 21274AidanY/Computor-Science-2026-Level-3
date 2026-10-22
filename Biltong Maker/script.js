@@ -10,15 +10,23 @@
 const socket = new WebSocket(`ws://${location.host}/ws`);
 
 function sendSettings() {
-    if (socket.readyState !== WebSocket.OPEN) return;
+    if (socket.readyState !== WebSocket.OPEN) {
+        console.error("WebSocket is not open; settings not sent.");
+        return;
+    }
 
-    socket.send(JSON.stringify({
+    const settings = {
         type: "settings",
         TempMin: tempBar.getMin(),
         TempMax: tempBar.getMax(),
         HumidMin: humidityBar.getMin(),
-        HumidMax: humidityBar.getMax()
-    }));
+        HumidMax: humidityBar.getMax(),
+        autoControl: document.getElementById('toggle-trigger').checked
+    };
+
+    const message = JSON.stringify(settings);
+    console.log("Sending:", message);
+    socket.send(message);
 }
 
 //HAN COMMENT what does this chunk of code do?
@@ -145,10 +153,17 @@ const humidityBar = setupRadialBar({
     numberSuffix: '%'
 });
 
+const autoToggle = document.getElementById('toggle-trigger');
+
+ 
+
+autoToggle.addEventListener('change', sendSettings);
+
 //HAN COMMENT what does this chunk of code do?
 socket.addEventListener('open', () => {
     console.log("Connected to ESP32");
-    socket.send("getStates"); // ask for an immediate reading
+    socket.send("getStates");
+    sendSettings();
 });
 
 //HAN COMMENT what does this chunk of code do?

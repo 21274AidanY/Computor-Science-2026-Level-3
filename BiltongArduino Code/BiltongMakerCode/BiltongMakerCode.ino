@@ -43,6 +43,8 @@ float TempMax;
 float HumidMin;
 float HumidMax;
 
+bool autoControl = true;
+
 //Info
 float TempValue; //Read from AHT, in C units
 float HumidtyValue; //Read from AHT, % RH
@@ -124,7 +126,7 @@ String getOutputStates()
 
 /**
 Sends a message to all clients connected to ip address with a JSON message
-*/
+*/  
 void notifyClients(String state) {
   ws.textAll(state);
 }
@@ -135,6 +137,8 @@ Handles messages from clients in the if statements below
 void handleWebSocketMessage(void* arg, uint8_t* data, size_t len) 
 {
   AwsFrameInfo* info = (AwsFrameInfo*)arg;
+
+  Serial.println("received");
 
   if (info->final && info->index == 0 && info->len == len && info->opcode == WS_TEXT) 
   {
@@ -173,10 +177,12 @@ void handleWebSocketMessage(void* arg, uint8_t* data, size_t len)
           TempMax = (double)json["TempMax"];
           HumidMin = (double)json["HumidMin"];
           HumidMax = (double)json["HumidMax"];
+          autoControl = (bool)json["autoControl"];
 
           Serial.println("Settings updated:");
           Serial.printf("Temperature: %.1f - %.1f\n", TempMin, TempMax);
           Serial.printf("Humidity: %.1f - %.1f\n", HumidMin, HumidMax);
+          Serial.printf("Automatic control: %s\n", autoControl ? "ON" : "OFF");
       }
     }
   }
