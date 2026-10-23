@@ -12,7 +12,6 @@
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <Arduino_JSON.h>
-#include <ESPmDNS.h>
 
 
 //--- WiFi Info/Config ---
@@ -231,7 +230,7 @@ void initWebSocket() {
   Serial.println("websocket should be running now");
 }
 
-//HAN COMMENT tell me what setup is setting up
+//This method initilizes and sets up the following in order: pin configuration, serial monitor, WIFI, LittleFS, ensures website files, webserver, AHT + BMP sensors and the inbuilt TFT screen.
 void setup() 
 {
   pinMode(FanPIN, OUTPUT);
@@ -249,28 +248,37 @@ void setup()
 
   Serial.println("- Serial monitor initilized successfully - ");
 
+  Serial.println("- Initilizing Screen -");
+  pinMode(TFT_I2C_POWER, OUTPUT);
+  digitalWrite(TFT_I2C_POWER, HIGH);
+  pinMode(TFT_BACKLITE, OUTPUT);
+  digitalWrite(TFT_BACKLITE, HIGH);
+
+  TFTScreen.init(135, 240);
+  TFTScreen.setRotation(3);
+  TFTScreen.fillScreen(ST77XX_WHITE);
+  TFTScreen.setTextSize(1);
+  TFTScreen.setTextColor(ST77XX_RED);
+  TFTScreen.setCursor(0, 0);
+  Serial.println("- Screen initilized successfully -");
+
   Serial.println("Attempting to connect to WIFI");
   WiFi.mode(WIFI_STA);
   WiFi.begin(SSID, PASSWORD);
   
   Serial.print("Loading.");
+  TFTScreen.println("Connecting to WIFI");
   while (WiFi.status() != WL_CONNECTED) 
   {
     delay(1000);
     Serial.print(".");
   }
+  TFTScreen.fillScreen(ST77XX_WHITE);
   Serial.println("..");
   Serial.print("IP Address: ");
   Serial.println(WiFi.localIP());
 
   Serial.println("- WiFi has been initilized successfully -");
-
-  // --- mDNS setup ---
-  if (!MDNS.begin("biltongmaker")) {  // <-- this becomes "biltongmaker.local"
-    Serial.println("Error starting mDNS");
-  } else {
-    Serial.println("mDNS responder started: http://biltongmaker.local");
-  }
 
   Serial.println("- Initilizing LittleFS -");
   initLittleFS();
@@ -284,19 +292,39 @@ void setup()
   Serial.println(LittleFS.totalBytes());
 
   Serial.println("- Initilizing Sensors -");
-  // AHT20 initilize
-  if (!aht.begin()) 
+
+  bool tempSensorOK = true;
+  bool pressureSensorOK = true;
+
+  // Initialise AHT20 temperature and humidity sensor
+  if (!aht.begin())
   {
-    Serial.println("AHT20 not found!");
-    while (1);
+    Serial.println("ERROR: Tempreature sensor (AHT20) not found!");
+    TFTScreen.println("ERROR: AHT20 not found!");
+    TFTScreen.println("Check connections.");
+    tempSensorOK = false;
   }
 
-  // BMP280 init (0x76 or 0x77)
-  if (!bmp.begin(0x77)) 
+  // Initialise BMP280 pressure sensor
+  if (!bmp.begin(0x77))
   {
-    Serial.println("BMP280 not found at 0x77!");
-    while (1);
+    Serial.println("ERROR: Humidity sensor (BMP280) not found at 0x77!");
+    TFTScreen.println("ERROR: BMP280 not found!");
+    TFTScreen.println("Check connections.");
+    pressureSensorOK = false;
   }
+
+  // Stop if either required sensor failed
+  if (!tempSensorOK || !pressureSensorOK)
+  {
+    Serial.println("Sensor initialisation failed. System halted.");
+    while (true)
+    {
+      delay(1000);
+    }
+  }
+
+  Serial.println("- Sensors initilized successfully -");
 
   Serial.println("- Initilizing WebServer -");
 
@@ -306,19 +334,6 @@ void setup()
   server.begin();
   Serial.println("- WebServer initilized successfully -");
 
-  Serial.println("- Sensors initilized successfully -");
-
-  pinMode(TFT_I2C_POWER, OUTPUT);
-  digitalWrite(TFT_I2C_POWER, HIGH);
-  pinMode(TFT_BACKLITE, OUTPUT);
-  digitalWrite(TFT_BACKLITE, HIGH);
-
-  Serial.println("- Initilizing Screen -");
-  TFTScreen.init(135, 240);
-  TFTScreen.setRotation(3);
-  TFTScreen.fillScreen(ST77XX_WHITE);
-  Serial.println("- Screen initilized successfully -");
-
   Serial.println();
   Serial.println("--- SETUP COMPLETED ---");
   Serial.println();
@@ -326,6 +341,8 @@ void setup()
 
 //HAN COMMENT tell me the overview of what happens in this loop
 
+//This loop firstly reads the AHT and BMP sensor values. It then comapres those results to the range settings receieved from the website. Depending on its results it will activate/deactivate the fan and/or heat lamp to attempt to bring the values within the set range.
+//The sensor values are then sent off to the website so it can update its displays.
 void loop()
 {
   // Read current temperature and humidity
@@ -391,7 +408,7 @@ int CheckRanges(float Data, float Min, float Max)
   return 0; // Data is within range
 }
 
-//HAN COMMENT what does this method do? and do we need to do anything with the tft screen?
+// This method reads all the values from the AHT and BMP sensor and then prints it to the serial monitor and TFT screen
 void ReadSensors()
 {
   //Read sensors
@@ -415,4 +432,25 @@ void ReadSensors()
   Serial.print(" °C, Pressure: ");
   Serial.print(bmp.readPressure() / 100.0);
   Serial.println(" hPa");
+
+  // Clear the TFT screen
+  TFTScreen.fillScreen(ST77XX_WHITE);
+
+  // Set text appearance
+  TFTScreen.setTextColor(ST77XX_BLACK);
+  TFTScreen.setTextSize(2);
+
+  // Print temperature
+  TFTScreen.setCursor(10, 20);
+  TFTScreen.print("Temperature:");
+  TFTScreen.setCursor(10, 45);
+  TFTScreen.print(TempValue, 1);
+  TFTScreen.print(" C");
+
+  // Print humidity
+  TFTScreen.setCursor(10, 80);
+  TFTScreen.print("Humidity:");
+  TFTScreen.setCursor(10, 105);
+  TFTScreen.print(HumidtyValue, 1);
+  TFTScreen.print(" %");
 }
