@@ -25,13 +25,11 @@ body
     gap: 40px;
 }
 
-.bars
-{
+.bars {
     display: flex;
     flex-wrap: wrap;
-    justify-self: center;
-    align-items: center;
     justify-content: center;
+    align-items: center;
 }
 
 .progressbar
@@ -82,9 +80,23 @@ body
         6px 6px 10px -1px rgba(255,255,255,0.7);
 }
 
+.progress-title {
+    text-align: center;
+    font-size: 1.4rem;
+}
+
+.range-display {
+    width: 150px;
+    text-align: left;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #646464;
+    white-space: nowrap;
+}
+
 .inner
 {
-    height: 100px;
+    height: 96px;
     width: 100px;
     border-radius: 50%;
     display: flex;
@@ -114,19 +126,30 @@ circle{
     justify-content: center;
 }
 
-.main-progress
-{
+.main-progress {
     display: flex;
-    width: 190px;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-left: 24px;
+    width: auto;
 }
 
-.progressControls {   
-    width: 40px;
-    height: 60px;
+.progress-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.progressControls {
+    width: 43px;
+    height: 159px;
     z-index: 3;
     border-radius: 10%;
     background-color: white;
-    transform: translateX(35px) translateY(8px);
+    transform: none;
+    margin-left: 29px;
 }
 
 /* Container for the toggle switch */
@@ -168,6 +191,29 @@ circle{
   background-color: white;
   border-radius: 50%;
   transition: transform 0.3s ease;
+}
+
+.dashboard {
+    width: fit-content;
+    margin: 0 auto;
+}
+
+
+.bottom-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+    margin-top: 20px;
+    margin-left: -59px;
+}
+
+/* Keep the toggle and its description together */
+.toggle-section {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-align: left;
 }
 
 /* Background color changes when the checkbox is checked */

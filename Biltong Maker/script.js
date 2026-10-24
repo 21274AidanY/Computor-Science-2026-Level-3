@@ -73,21 +73,25 @@ function setupRadialBar({
     //Range control buttons, change their max or min and then send the new values using sendSettings();
     upMax.addEventListener('click', () => {
         safeMax = Math.min(100, safeMax + step);
+        updateRangeDisplays();
         sendSettings();
     });
 
     downMax.addEventListener('click', () => {
         safeMax = Math.max(0, safeMax - step);
+        updateRangeDisplays();
         sendSettings();
     });
 
     upMin.addEventListener('click', () => {
         safeMin = Math.min(100, safeMin + step);
+        updateRangeDisplays();
         sendSettings();
     });
 
     downMin.addEventListener('click', () => {
         safeMin = Math.max(0, safeMin - step);
+        updateRangeDisplays();
         sendSettings();
     });
 
@@ -153,9 +157,16 @@ const humidityBar = setupRadialBar({
     numberSuffix: '%'
 });
 
-const autoToggle = document.getElementById('toggle-trigger');
+// Update the displayed minimum and maximum temperature and humidity
+function updateRangeDisplays() {
+    document.getElementById("temp-range").textContent =
+        `Range: ${tempBar.getMin()}°C – ${tempBar.getMax()}°C`;
 
- 
+    document.getElementById("humidity-range").textContent =
+        `Range: ${humidityBar.getMin()}% – ${humidityBar.getMax()}%`;
+}
+
+const autoToggle = document.getElementById('toggle-trigger');
 
 autoToggle.addEventListener('change', sendSettings);
 

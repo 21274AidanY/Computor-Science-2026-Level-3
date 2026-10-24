@@ -15,8 +15,8 @@
 
 
 //--- WiFi Info/Config ---
-const char SSID[] = "T8-Arduino";
-const char PASSWORD[] = "T8-Arduino";
+const char SSID[] = "KANDY";
+const char PASSWORD[] = "Br33andA1dan";
 
 //------------- WebServer setup --------------
 //Create an async web server on port 80
@@ -292,17 +292,19 @@ void setup()
   Serial.println(LittleFS.totalBytes());
 
   Serial.println("- Initilizing Sensors -");
-
-  bool tempSensorOK = true;
-  bool pressureSensorOK = true;
-
+  //Initialise AHT20 and BMP280 sensors, only halt program if AHT20 dosnt work becuase it dosnt use the BMP280 sensor values. However if its not connected it could be of concern so we notify
   // Initialise AHT20 temperature and humidity sensor
   if (!aht.begin())
   {
     Serial.println("ERROR: Tempreature sensor (AHT20) not found!");
     TFTScreen.println("ERROR: AHT20 not found!");
     TFTScreen.println("Check connections.");
-    tempSensorOK = false;
+
+    Serial.println("Sensor initialisation failed. System halted.");
+    while (true)
+    {
+      delay(1000);
+    }
   }
 
   // Initialise BMP280 pressure sensor
@@ -311,17 +313,6 @@ void setup()
     Serial.println("ERROR: Humidity sensor (BMP280) not found at 0x77!");
     TFTScreen.println("ERROR: BMP280 not found!");
     TFTScreen.println("Check connections.");
-    pressureSensorOK = false;
-  }
-
-  // Stop if either required sensor failed
-  if (!tempSensorOK || !pressureSensorOK)
-  {
-    Serial.println("Sensor initialisation failed. System halted.");
-    while (true)
-    {
-      delay(1000);
-    }
   }
 
   Serial.println("- Sensors initilized successfully -");

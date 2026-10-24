@@ -11,97 +11,59 @@
 
 <body>
     <h1>Biltong Maker</h1>
-    <br><br>
-    <!--DEV CONTROLS:
-    <div class="controlsMin">
-		<!-- HAN COMMENT - what is this slider for? - HAN COMMENT -->
-        <!--<div class="control">
-            <input
-                type="range"
-                min="0.01"
-                max="100.5"
-                value="65"
-                class="slider"
-                id="slider1-2">
-        </div>
-<!-- HAN COMMENT - what is this slider for? - HAN COMMENT -->
-        <!--<div class="control">
-            <input
-                type="range"
-                min="0.01"
-                max="100.5"
-                value="40"
-                class="slider"
-                id="slider2-2">
-        </div>
-    </div>
-    
-    <div class="controlsMin">
-		<!-- HAN COMMENT - what is this slider for? - HAN COMMENT -->
-        <!--<div class="control">
-            <input
-                type="range"
-                min="0.01"
-                max="100.5"
-                value="65"
-                class="slider"
-                id="slider1-3">
-        </div>
-<!-- HAN COMMENT - what is this slider for? - HAN COMMENT -->
-        <!--<div class="control">
-            <input
-                type="range"
-                min="0.01"
-                max="100.5"
-                value="40"
-                class="slider"
-                id="slider2-3">
-        </div>
-    </div> -->
-    
-    <div>
+    <br>
+    <div class="dashboard">
         <!-- HAN COMMENT - either a big comment here explaining the bars or several to explain the main-progress sections - HAN COMMENT -->
         <div class="bars">
             <div class="main-progress">
-                <div class="skill" data-index="0">
-
-                    <div class="outer">
-                        <div class="inner">
-                            <div class="number">65%</div>
-                        </div>
+                <div class="progress-content">
+                    <h2 class="progress-title">Temperature</h2>
+                    
+                    <div class="range-display" id="temp-range">
+                        50% – 65%
                     </div>
 
-                    <svg class="progress-svg" xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
-                        <defs>
-                            <linearGradient id="GradientColor1">
-                                <stop offset="0%" stop-color="#b941d3"/>
-                                <stop offset="100%" stop-color="#511788"/>
-                            </linearGradient>
-                        </defs>
+                    <div class="skill" data-index="0">
 
-                        <circle
-                            cx="100"
-                            cy="100"
-                            r="75"
-                            stroke-linecap="round"
-                            stroke="url(#GradientColor1)"/>
-                    </svg>
+                        <div class="outer">
+                            <div class="inner">
+                                <div class="number">65%</div>
+                            </div>
+                        </div>
 
-                    <svg class="safe-svg" xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
-                        <defs>
-                            <linearGradient id="GradientColorSafe1">
-                                <stop offset="0%" stop-color="#22ff35"/>
-                                <stop offset="100%" stop-color="#27843c"/>
-                            </linearGradient>
-                        </defs>
+                        <svg class="progress-svg" xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+                            <defs>
+                                <linearGradient id="GradientColor1">
+                                    <stop offset="0%" stop-color="#b941d3"/>
+                                    <stop offset="100%" stop-color="#511788"/>
+                                </linearGradient>
+                            </defs>
 
-                        <circle
-                            cx="100"
-                            cy="100"
-                            r="85"
-                            stroke-linecap="round"
-                            stroke="url(#GradientColorSafe1)"/>
-                    </svg>
+                            <circle
+                                cx="100"
+                                cy="100"
+                                r="75"
+                                stroke-linecap="round"
+                                stroke="url(#GradientColor1)"/>
+                        </svg>
+
+
+                        <svg class="safe-svg" xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+                            <defs>
+                                <linearGradient id="GradientColorSafe1">
+                                    <stop offset="0%" stop-color="#22ff35"/>
+                                    <stop offset="100%" stop-color="#27843c"/>
+                                </linearGradient>
+                            </defs>
+
+                            <circle
+                                cx="100"
+                                cy="100"
+                                r="85"
+                                stroke-linecap="round"
+                                stroke="url(#GradientColorSafe1)"/>
+                        </svg>
+                    </div>  
                 </div>
 
                 <div class="progressControls">
@@ -112,49 +74,55 @@
                 </div>
             </div>
 
-            <div class="main-progress">         
-                <div class="skill" data-index="1"> 
-                    <div class="outer">
-                        <div class="inner">
-                            <div class="number">40%</div>
-                        </div>
+            <div class="main-progress">
+                <div class="progress-content">
+                    <h2 class="progress-title">Humidity</h2>
+
+                    <div class="range-display" id="humidity-range">
+                        50% – 65%
                     </div>
 
-                    <svg class="progress-svg" xmlns="http://www.w3.org/2000/svg"
-                         width="200" height="200" viewBox="0 0 200 200">
+                    <div class="skill" data-index="1">
+                        <div class="outer">
+                            <div class="inner">
+                                <div class="number">40%</div>
+                            </div>
+                        </div>
 
-                        <defs>
-                            <linearGradient id="GradientColor2">
-                                <stop offset="0%" stop-color="#22d3ee"/>
-                                <stop offset="100%" stop-color="#2563eb"/>
-                            </linearGradient>
-                        </defs>
+                        <svg class="progress-svg" xmlns="http://www.w3.org/2000/svg"
+                             width="200" height="200" viewBox="0 0 200 200">
+                            <defs>
+                                <linearGradient id="GradientColor2">
+                                    <stop offset="0%" stop-color="#22d3ee"/>
+                                    <stop offset="100%" stop-color="#2563eb"/>
+                                </linearGradient>
+                            </defs>
 
-                        <circle
-                            cx="100"
-                            cy="100"
-                            r="75"
-                            stroke-linecap="round"
-                            stroke="url(#GradientColor2)"/>
-                    </svg>
+                            <circle
+                                cx="100"
+                                cy="100"
+                                r="75"
+                                stroke-linecap="round"
+                                stroke="url(#GradientColor2)"/>
+                        </svg>
 
-                    <svg class="safe-svg" xmlns="http://www.w3.org/2000/svg"
-                         width="200" height="200" viewBox="0 0 200 200">
+                        <svg class="safe-svg" xmlns="http://www.w3.org/2000/svg"
+                             width="200" height="200" viewBox="0 0 200 200">
+                            <defs>
+                                <linearGradient id="GradientColorSafe2">
+                                    <stop offset="0%" stop-color="#22ff35"/>
+                                    <stop offset="100%" stop-color="#27843c"/>
+                                </linearGradient>
+                            </defs>
 
-                        <defs>
-                            <linearGradient id="GradientColorSafe2">
-                                <stop offset="0%" stop-color="#22ff35"/>
-                                <stop offset="100%" stop-color="#27843c"/>
-                            </linearGradient>
-                        </defs>
-
-                        <circle
-                            cx="100"
-                            cy="100"
-                            r="85"
-                            stroke-linecap="round"
-                            stroke="url(#GradientColorSafe2)"/>
-                    </svg>
+                            <circle
+                                cx="100"
+                                cy="100"
+                                r="85"
+                                stroke-linecap="round"
+                                stroke="url(#GradientColorSafe2)"/>
+                        </svg>
+                    </div>
                 </div>
 
                 <div class="progressControls">
@@ -164,17 +132,24 @@
                     <button class="downMin">down min</button>
                 </div>
             </div>
-        </div>
-    
-        <div>
-            <label class="toggle-switch">
-                  <input type="checkbox" id="toggle-trigger" checked>
-                  <span class="slider"></span>
-            </label>
-            <h4>OFF/ON</h4>  <h6>turn off all automatic tempreature and humidty managers</h6>
         </div>
     </div>
     
-    <a href="usermanual.html">Go to the user manual</a>
+    <div class="bottom-controls">
+        <div class="toggle-section">
+            <label class="toggle-switch">
+                <input type="checkbox" id="toggle-trigger" checked>
+                <span class="slider"></span>
+            </label>
+
+            <div>
+                <h4>OFF/ON</h4>
+                <h6>Turn off all automatic temperature and humidity managers</h6>
+            </div>
+        </div>
+
+        <a href="usermanual.html">Go to the user manual</a>
+    </div>
+    
 </body>
 </html>
