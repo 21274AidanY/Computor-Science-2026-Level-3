@@ -7,11 +7,42 @@
 </head>
 <body>
 
-    <h1>User Manual</h1>
-    <p>Confused on how to use the dashboard? Find instructions here.</p>
+    <h1>Biltong Maker - User Manual</h1>
+    <p>This manual explains how to use the Biltong Maker dashboard to monitor temperature and humidity and control the automatic settings.</p>
     
-    <!-- Link back to your home page -->
+    <!-- Link back to home page -->
     <a href="index.html">Back to Dashboard</a>
+    
+    <h2>1. Monitoring Temperature and Humidity</h2>
+    <p>The dashboard displays the current temperature and humidity readings from the sensors inside the biltong maker.</p>
+    <ul>
+        <li><strong>Temperature:</strong> Displays the current temperature in degrees Celsius (°C).</li>
+        <li><strong>Humidity:</strong> Displays the current humidity as a percentage (%).</li>
+        <li><strong>Progress circles:</strong> Visually represent the current sensor readings.</li>
+        <li><strong>Safe range:</strong> The indicator shows the configured minimum and maximum thresholds.</li>
+    </ul>
 
+    <h2>2. Adjusting the Temperature and Humidity Ranges</h2>
+    <p>Each reading has controls that allow you to adjust its minimum and maximum thresholds.</p>
+    <ol>
+        <li>Locate the controls beside the temperature or humidity display.</li>
+        <li>Use the buttons to increase or decrease the minimum and maximum values.</li>
+        <li>Check the displayed range to confirm your selected thresholds.</li>
+        <li>Your changes are sent to the ESP32 automatically.</li>
+    </ol>
+    <p>Temperature thresholds are measured in °C, while humidity thresholds are measured as percentages.</p>
+
+    <h2>3. Automatic Control</h2>
+    <p>The automatic control toggle enables or disables the system's automatic management of the heat lamp and fan.</p>
+    <ul>
+        <li><strong>Enabled:</strong> The ESP32 automatically controls the heat lamp and fan using the configured temperature and humidity thresholds.</li>
+        <li><strong>Disabled:</strong> Automatic control is switched off, and the system turns off the heat lamp and fan.</li>
+    </ul>
+    <p>When automatic control is enabled, the heat lamp responds to temperature and the fan responds to humidity.</p>
+
+    <h2>4. Returning to the Dashboard</h2>
+    <p>Select the "Back to Dashboard" link at the top of this page to return to the main dashboard.</p>
+
+    
 </body>
 </html>

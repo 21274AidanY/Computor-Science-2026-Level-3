@@ -8,7 +8,6 @@
 /* This section styles the main webpage layout. It centers the content vertically and horizontally, alignes and spaces*/
 body
 {
-    border: 2px solid green;
     background-color: ghostwhite;
     height: 100vh;
     display: flex;
