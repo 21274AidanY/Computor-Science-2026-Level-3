@@ -1,11 +1,12 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Radial Progress Bar</title>
-<!-- HAN COMMENT - what are the stylesheet and javascript links for & what does defer do for when the javascript file is read vs html file - HAN COMMENT -->
+    <!--The stylesheet link connects the HTML to style.css which controls the visuals-->
     <link rel="stylesheet" href="styles.css">
+    <!--The script link connects the HTML to script.js which handles the websites functionality-->
     <script defer src="script.js"></script>
 </head>
 
@@ -13,7 +14,11 @@
     <h1>Biltong Maker</h1>
     <br>
     <div class="dashboard">
-        <!-- HAN COMMENT - either a big comment here explaining the bars or several to explain the main-progress sections - HAN COMMENT -->
+        <!-- This section contains the two main progress bar dispalys for temperature and humidity 
+        Each display is structured using nested div elements to organise its title, numerical reading, adjustable safe range and circcular progress graphics
+        The main progress SVG displays the current sensor reading, while the safe SVG highlights the desired range
+        The progressControls buttns allow the user to adjust the minimum and maximum thresholds for each measurement
+        Both displays are structured simmilarlry meaning they can eb styled consistently and managed by the javascript-->
         <div class="bars">
             <div class="main-progress">
                 <div class="progress-content">
@@ -135,6 +140,7 @@
         </div>
     </div>
     
+    <!-- This sections contains the ON/OFF toggle which lets users decide wether or not they want their biltong maker running alongside a link to the user manual-->
     <div class="bottom-controls">
         <div class="toggle-section">
             <label class="toggle-switch">
@@ -147,7 +153,8 @@
                 <h6>Turn off all automatic temperature and humidity managers</h6>
             </div>
         </div>
-
+        <br>
+        Confused about how to use your Biltong Maker?
         <a href="usermanual.html">Go to the user manual</a>
     </div>
     

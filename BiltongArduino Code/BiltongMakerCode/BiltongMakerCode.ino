@@ -15,8 +15,8 @@
 
 
 //--- WiFi Info/Config ---
-const char SSID[] = "KANDY";
-const char PASSWORD[] = "Br33andA1dan";
+const char SSID[] = "T8-Arduino";
+const char PASSWORD[] = "T8-Arduino";
 
 //------------- WebServer setup --------------
 //Create an async web server on port 80
@@ -28,7 +28,6 @@ AsyncWebSocket ws("/ws");
 Adafruit_ST7789 TFTScreen = Adafruit_ST7789(TFT_CS, TFT_DC, TFT_RST);
 
 //--- AHT and BMP sensors ---
-//Uses I2C interface, no pin declaration needed
 Adafruit_AHTX0 aht; //Tempreature and humidity
 Adafruit_BMP280 bmp; //Tempreature and preassure
 
@@ -45,9 +44,8 @@ float HumidMax;
 bool autoControl = true;
 
 //Info
-float TempValue; //Read from AHT, in C units
-float HumidtyValue; //Read from AHT, % RH
-//float PreasureValue; //Read from BMP, in hPA units
+float TempValue; //C units
+float HumidtyValue; //% units
 
 bool isHeating; //Is it currently trying to heat with the lamp
 bool isDrying; //Is it currenntly trying to dry with the fan
@@ -111,10 +109,7 @@ void writeFile(fs::FS& fs, const char* path, const char* message)
   }
 }
 
-/**
-set up a JSON array and hold the states of all values we care about
-pins and their current states variables and their current values
-*/
+//This function packages the current temperature and humidity readings into a JSON object so they can be sent to the website.
 String getOutputStates() 
 {
   JSONVar myArray;
@@ -126,16 +121,12 @@ String getOutputStates()
   return jsonString;
 }
 
-/**
-Sends a message to all clients connected to ip address with a JSON message
-*/  
+//Sends a message to all clients connected WebSocket Clients
 void notifyClients(String state) {
   ws.textAll(state);
 }
 
-/**
-Handles messages from clients in the if statements below
-*/
+//This function processes messages received from the website. It extracts the temperature and humidity thresholds and automatic control setting from the JSON message, then updates the corresponding variables.
 void handleWebSocketMessage(void* arg, uint8_t* data, size_t len) 
 {
   AwsFrameInfo* info = (AwsFrameInfo*)arg;
@@ -190,9 +181,7 @@ void handleWebSocketMessage(void* arg, uint8_t* data, size_t len)
   }
 }
 
-/**
-Event listener handles different asyncronous steps from the web socket
-*/
+//Event listener handles different asyncronous steps from the web socket
 void onEvent(AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType type, void* arg, uint8_t* data, size_t len) 
 {
   switch (type) 
@@ -220,17 +209,14 @@ void onEvent(AsyncWebSocket* server, AsyncWebSocketClient* client, AwsEventType 
 }
 
 
-/**
-WebSocket setup
-What to do when an event happens on the ws socket and adding a handler to the server
-*/
+//WebSocket setup, what to do when an event happens on the ws socket and adding a handler to the server
 void initWebSocket() {
   ws.onEvent(onEvent);
   server.addHandler(&ws);
   Serial.println("websocket should be running now");
 }
 
-//This method initilizes and sets up the following in order: pin configuration, serial monitor, WIFI, LittleFS, ensures website files, webserver, AHT + BMP sensors and the inbuilt TFT screen.
+//This method initilizes and sets up the following in order: pin configuration, serial monitor, WIFI, LittleFS, ensures website files exist, webserver, AHT + BMP sensors and the inbuilt TFT screen.
 void setup() 
 {
   pinMode(FanPIN, OUTPUT);
@@ -291,8 +277,9 @@ void setup()
   Serial.print("File system total bytes: ");
   Serial.println(LittleFS.totalBytes());
 
-  Serial.println("- Initilizing Sensors -");
   //Initialise AHT20 and BMP280 sensors, only halt program if AHT20 dosnt work becuase it dosnt use the BMP280 sensor values. However if its not connected it could be of concern so we notify
+  Serial.println("- Initilizing Sensors -");
+  
   // Initialise AHT20 temperature and humidity sensor
   if (!aht.begin())
   {
@@ -307,7 +294,7 @@ void setup()
     }
   }
 
-  // Initialise BMP280 pressure sensor
+  // Initialise the BMP280 pressure sensor. If it fails to initialise display an error message but allow the program to continue because the system does not rely on its readings.
   if (!bmp.begin(0x77))
   {
     Serial.println("ERROR: Humidity sensor (BMP280) not found at 0x77!");
@@ -329,8 +316,6 @@ void setup()
   Serial.println("--- SETUP COMPLETED ---");
   Serial.println();
 }
-
-//HAN COMMENT tell me the overview of what happens in this loop
 
 //This loop firstly reads the AHT and BMP sensor values. It then comapres those results to the range settings receieved from the website. Depending on its results it will activate/deactivate the fan and/or heat lamp to attempt to bring the values within the set range.
 //The sensor values are then sent off to the website so it can update its displays.
@@ -383,23 +368,8 @@ void loop()
   delay(2000);
 }
 
-
-//This method checks the data of choice and compares them to its ranges. It then reports back with a number to signify how it should react. (e.g. 1, increase data to fit range. -1, decrease data to fit range. 0 data fits range)
-int CheckRanges(float Data, float Min, float Max)
-{
-  if (Data >= Max)
-  {
-    return -1; // Data is too high
-  }
-  else if (Data <= Min)
-  {
-    return 1; // Data is too low
-  }
-
-  return 0; // Data is within range
-}
-
 // This method reads all the values from the AHT and BMP sensor and then prints it to the serial monitor and TFT screen
+//It only stores the AHT sensor values, as they are the only needed ones
 void ReadSensors()
 {
   //Read sensors

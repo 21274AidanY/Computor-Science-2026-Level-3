@@ -5,10 +5,10 @@
    which are only *used*, not *called*, at message time)
 ========================= */
 
-//HAN COMMENT I have added a comment for every event listener and function
-
 const socket = new WebSocket(`ws://${location.host}/ws`);
 
+//This function sends the current temp and humidity threshold alongside with the on/off state to the ESP32
+//It collects teh values from the progress bas and the toggle, packages thhem into a JavaScript object, converts them to a json string and sends it.
 function sendSettings() {
     if (socket.readyState !== WebSocket.OPEN) {
         console.error("WebSocket is not open; settings not sent.");
@@ -29,13 +29,12 @@ function sendSettings() {
     socket.send(message);
 }
 
-//HAN COMMENT what does this chunk of code do?
+//This function creates and manages the radial progress bars for either temp or humnidity.
+//This function also sets up the range adjustmenet buttons, animates changes to the sensor readings, and displays the selected safe range
 function setupRadialBar({
     skillSelector,
-    minSliderId,
-    maxSliderId,
-    numberSuffix
-}) {
+    numberSuffix}) 
+{
     const skill = document.querySelector(skillSelector);
     const number = skill.querySelector('.number');
     const circles = skill.querySelectorAll('circle');
@@ -58,7 +57,6 @@ function setupRadialBar({
     let current = 0;
     let target = 0;
 
-    // Safe range values are stored directly instead of using sliders.
     let safeMin = 30;
     let safeMax = 70;
 
@@ -143,10 +141,7 @@ function setupRadialBar({
 }
 
 
-/* =========================
-   BAR SETUP
-========================= */
-
+//Bar Setup
 const tempBar = setupRadialBar({
     skillSelector: '.skill[data-index="0"]',
     numberSuffix: '°C'
@@ -170,14 +165,15 @@ const autoToggle = document.getElementById('toggle-trigger');
 
 autoToggle.addEventListener('change', sendSettings);
 
-//HAN COMMENT what does this chunk of code do?
+//This event listner runs when the WebSocket connects to the ESP32 and attemptes to sync the information between them
+//It logs a connection message, requests the current sensor readings and send the current settings
 socket.addEventListener('open', () => {
     console.log("Connected to ESP32");
     socket.send("getStates");
     sendSettings();
 });
 
-//HAN COMMENT what does this chunk of code do?
+//This event listener handles messages recived from the ESP32 which contains sensor data
 socket.addEventListener('message', (event) => {
     console.log("RAW MESSAGE:", event.data);
 
@@ -203,12 +199,12 @@ socket.addEventListener('message', (event) => {
     }
 });
 
-//HAN COMMENT what does this chunk of code do?
+//This event listener runs when the WebSocket conncetion closes. It displays a message in the console for debug
 socket.addEventListener('close', () => {
     console.log("Disconnected from ESP32");
 });
 
-//HAN COMMENT what does this chunk of code do?
+//This event listener runs when the WebSocket conncetion errors and then logs the error to the console. This is for debugging.
 socket.addEventListener('error', (err) => {
     console.error("WebSocket error:", err);
 });
